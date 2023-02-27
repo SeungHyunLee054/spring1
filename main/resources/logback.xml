@@ -7,14 +7,6 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>java2022.log</file>
-        <encoder>
-            <pattern>%date{HH:mm:ss} [%thread] %level %logger{1} - %message%n
-            </pattern>
-        </encoder>
-    </appender>
-
     <root level="error">
         <appender-ref ref="STDOUT"/>
     </root>

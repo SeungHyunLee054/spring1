@@ -12,7 +12,7 @@ public interface ArticleDao {
 
     void addArticle(Article article);
 
-    int updateArticle(int articleId, String name, String newTitle);
+    int updateArticle(Article article);
 
-    int deleteArticle(int articleId, String name);
+    int deleteArticle(int articleId, int userId);
 }

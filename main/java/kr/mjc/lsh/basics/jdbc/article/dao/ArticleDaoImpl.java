@@ -14,19 +14,19 @@ import java.util.List;
 public class ArticleDaoImpl implements ArticleDao {
 
     private static final String LIST_ARTICLES =
-            "select articleId, title, content, name from article order by articleId desc limit ?,?";
+            "select articleId, title, name, cdate, udate from article order by articleId desc limit ?,?";
 
     private static final String GET_ARTICLE =
-            "select articleId, title, content, name from article where articleId=?";
+            "select articleId, title, content, userId, name, cdate, udate  from article where articleId=?";
 
     private static final String ADD_ARTICLE =
-            "insert article(title, content, name, cdate, udate ) values(?,?,?,current_date ,current_timestamp )";
+            "insert article(title, content, userId, name,) values(?,?,?,?)";
 
     private static final String UPDATE_ARTICLE =
-            "update article set title=?, udate=current_timestamp  where articleId=? and name=?";
+            "update article set title=?, content=?  where articleId=? and userId=?";
 
     private static final String DELETE_ARTICLE =
-            "delete from article where articleId=? and name=?";
+            "delete from article where articleId=? and userId=?";
 
     private final DataSource ds;
 
@@ -44,14 +44,15 @@ public class ArticleDaoImpl implements ArticleDao {
              PreparedStatement ps = conn.prepareStatement(LIST_ARTICLES)) {
             ps.setInt(1, offset);
             ps.setInt(2, count);
-            List<Article> articleList = new ArrayList<>();
             ResultSet rs = ps.executeQuery();
+            List<Article> articleList = new ArrayList<>();
             while (rs.next()) {
                 Article article = new Article();
                 article.setArticleId(rs.getInt("articleId"));
                 article.setTitle(rs.getString("title"));
-                article.setContent(rs.getString("content"));
                 article.setName(rs.getString("name"));
+                article.setCdate(rs.getString("cdate"));
+                article.setUdate(rs.getString("udate"));
                 articleList.add(article);
             }
             return articleList;
@@ -70,6 +71,11 @@ public class ArticleDaoImpl implements ArticleDao {
                 Article article = new Article();
                 article.setArticleId(rs.getInt("articleId"));
                 article.setName(rs.getString("name"));
+                article.setContent(rs.getString("content"));
+                article.setUserId(rs.getInt("userId"));
+                article.setName(rs.getString("name"));
+                article.setCdate(rs.getString("cdate"));
+                article.setUdate(rs.getString("udate"));
                 return article;
             }
             return null;
@@ -86,25 +92,23 @@ public class ArticleDaoImpl implements ArticleDao {
                      Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, article.getTitle());
             ps.setString(2, article.getContent());
-            ps.setString(3, article.getName());
+            ps.setInt(3, article.getUserId());
+            ps.setString(4, article.getName());
             ps.executeUpdate();
 
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next())
-                article.setArticleId(rs.getInt("insert_id"));
         } catch (SQLException e) {
             throw new DbException(e);
         }
     }
 
     @Override
-    public int updateArticle(int articleId, String name,
-                              String newTitle) {
+    public int updateArticle(Article article) {
         try (Connection con = ds.getConnection();
              PreparedStatement ps = con.prepareStatement(UPDATE_ARTICLE)) {
-            ps.setObject(1, newTitle);
-            ps.setObject(2, articleId);
-            ps.setObject(3, name);
+            ps.setString(1, article.getTitle());
+            ps.setString(2, article.getContent());
+            ps.setInt(3, article.getArticleId());
+            ps.setInt(4, article.getUserId());
             return ps.executeUpdate();
         } catch (SQLException e) {
             throw new DbException(e);
@@ -112,11 +116,11 @@ public class ArticleDaoImpl implements ArticleDao {
     }
 
     @Override
-    public int deleteArticle(int articleId, String name) throws DbException {
+    public int deleteArticle(int articleId, int userId) throws DbException {
         try (Connection con = ds.getConnection();
              PreparedStatement ps = con.prepareStatement(DELETE_ARTICLE)) {
             ps.setInt(1, articleId);
-            ps.setString(2, name);
+            ps.setInt(2, userId);
             return ps.executeUpdate();
         } catch (SQLException e) {
             throw new DbException(e);

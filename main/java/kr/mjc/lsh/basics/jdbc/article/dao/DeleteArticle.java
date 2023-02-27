@@ -10,9 +10,9 @@ public class DeleteArticle {
     public static void main(String[] args) {
         ArticleDao userDao = new ArticleDaoImpl();
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Delete - articleId name : ");
+        System.out.print("Delete - articleId userId : ");
 
-        int updatedRows = userDao.deleteArticle(scanner.nextInt(), scanner.next());
+        int updatedRows = userDao.deleteArticle(scanner.nextInt(), scanner.nextInt());
         if (updatedRows >= 1)
             log.debug("삭제 완료");
         else

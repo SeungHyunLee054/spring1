@@ -11,19 +11,19 @@ public class AddArticle {
 
     public static void main(String[] args) {
         ArticleDao articleDao = new ArticleDaoImpl();
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Insert - title content name : ");
-        Article article = new Article();
-        article.setTitle(scanner.next());
-        article.setContent(scanner.next());
-        article.setName(scanner.next());
+        Scanner scanner = new Scanner(System.in).useDelimiter("//");
+        System.out.print("Insert - title// : ");
+        String title = scanner.next();
+        System.out.print("Insert - content// : ");
+        String content = scanner.next();
         scanner.close();
 
-        try {
-            articleDao.addArticle(article);
-            log.debug(article.toString());
-        } catch (DbException e) {
-            log.error(e.toString());
-        }
+        Article article = new Article();
+        article.setTitle(title);
+        article.setContent(content);
+        article.setName("lsh");
+        articleDao.addArticle(article);
+
+        log.debug("저장 완료");
     }
 }
